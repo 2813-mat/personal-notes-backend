@@ -1,0 +1,47 @@
+version: '3.9'
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: mongo-notes
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: notes_db
+
+  maildev:
+    image: maildev/maildev
+    container_name: maildev
+    restart: always
+    ports:
+      - '1080:1080'  # interface web
+      - '1025:1025'  # servidor SMTP
+    environment:
+      - MAILDEV_INCOMING_USER=admin
+      - MAILDEV_INCOMING_PASS=admin
+
+  nest-app:
+    build: .
+    container_name: notes-backend
+    restart: always
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongo
+      - maildev
+    environment:
+      MONGO_URI: mongodb://mongo:27017/notes_db
+      SMTP_HOST: maildev
+      SMTP_PORT: 1025
+      SMTP_USER: admin
+      SMTP_PASS: admin
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: npm run start:dev
+
+volumes:
+  mongo_data:
