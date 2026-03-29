@@ -24,3 +24,6 @@ jobs:
 
       - name: Build and start container
         run: docker compose -f docker-compose.yml up --build -d
+
+      - name: reload nginx
+        run: docker exec infra-nginx nginx -s reload
