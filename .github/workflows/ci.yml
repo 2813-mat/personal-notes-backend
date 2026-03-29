@@ -14,7 +14,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Write .env
-        run: echo "${{ secrets.ENV_FILE }}" > .env
+        run: |
+          cat > .env << EOF
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}
+          NOTIFICATION_EMAIL=${{ secrets.NOTIFICATION_EMAIL }}
+          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          EOF
 
       - name: Build and start container
         run: docker compose -f docker-compose.yml up --build -d
