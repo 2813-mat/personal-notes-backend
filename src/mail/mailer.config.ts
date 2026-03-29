@@ -1,5 +1,4 @@
 import { MailerOptions } from '@nestjs-modules/mailer';
-import { join } from 'path';
 
 export const mailerConfig: MailerOptions = {
   transport: {

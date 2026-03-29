@@ -1,18 +1,24 @@
-# Imagem base
-FROM node:20
+# Stage 1: Build
+FROM node:20-alpine AS builder
 
-# Diretório de trabalho
 WORKDIR /usr/src/app
 
-# Copia o package.json e instala dependências
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
-# Copia o restante do projeto
 COPY . .
+RUN npm run build
 
-# Expõe a porta padrão do NestJS
+# Stage 2: Production
+FROM node:20-alpine AS production
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /usr/src/app/dist ./dist
+
 EXPOSE 3000
 
-# Comando padrão (em modo dev)
-CMD ["npm", "run", "start:dev"]
+CMD ["node", "dist/main"]
