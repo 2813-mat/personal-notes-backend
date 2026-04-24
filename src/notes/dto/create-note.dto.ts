@@ -1,8 +1,12 @@
-import { IsArray, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import 'reflect-metadata';
 
 export class NoteSectionDto {
+  @IsOptional()
+  @IsString()
+  _id?: string;
+
   @IsString()
   label: string;
 
