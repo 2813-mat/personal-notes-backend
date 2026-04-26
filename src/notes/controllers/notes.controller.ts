@@ -7,9 +7,13 @@ import {
   Delete,
   Put,
   UseGuards,
+  Sse,
+  MessageEvent,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Observable } from 'rxjs';
 import { NotesService } from '../services/notes.service';
+import { NotesEventsService } from '../services/notes-events.service';
 import { CreateNoteDto } from '../dto/create-note.dto';
 import { UpdateNoteDto } from '../dto/update-note.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -19,7 +23,17 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @Controller('notes')
 export class NotesController {
-  constructor(private readonly notesService: NotesService) {}
+  constructor(
+    private readonly notesService: NotesService,
+    private readonly notesEvents: NotesEventsService,
+  ) {}
+
+  @Sse('events')
+  @ApiOperation({ summary: 'Stream de eventos em tempo real (SSE)' })
+  @ApiResponse({ status: 200, description: 'Conexão SSE estabelecida' })
+  events(): Observable<MessageEvent> {
+    return this.notesEvents.asObservable();
+  }
 
   @Post()
   @ApiOperation({ summary: 'Criar nota' })

@@ -34,4 +34,9 @@ export class UsersService {
   async findByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email: email.toLowerCase() }).exec();
   }
+
+  async findAllEmails(): Promise<string[]> {
+    const users = await this.userModel.find({}, { email: 1 }).lean().exec();
+    return users.map((u) => u.email);
+  }
 }
